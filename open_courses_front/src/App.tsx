@@ -1,19 +1,30 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+import CourseCreator from '@/pages/CourseCreatorMainPage'
+import NotFoundPage from '@/pages/NotFoundPage'
 
 import { Toaster } from "@/components/ui/sonner";
 
-function App() {
-  const [count, setCount] = useState(0)
+function Router() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<CourseCreator />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
 
+function App() {
   return (
     <>
-      <h1>Hello, Ipsilon</h1>
+      <Router />
       <Toaster />
     </>
-  )
+  );
 }
 
 export default App

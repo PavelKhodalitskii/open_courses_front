@@ -1,12 +1,15 @@
 import { useState } from 'react'
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { initCsrfToken } from './api/client';
 
 import CourseCreator from '@/pages/CourseCreatorMainPage'
 import LoginPage from '@/pages/LoginPage'
 import NotFoundPage from '@/pages/NotFoundPage'
 
 import { Toaster } from "@/components/ui/sonner";
+
+initCsrfToken()
 
 function Router() {
   return (

@@ -4,6 +4,8 @@ import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {Button} from "@/components/ui/button";
 
+import apiClient from '@/api/client';
+
 type FormData = {
   email: string;
   password: string;
@@ -18,13 +20,11 @@ function LoginForm() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const response = await fetch("/api/login", {
-        method: "POST",
+      const response = await apiClient.post("/auths/session_based_auths/login/", JSON.stringify(data), 
+      {
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
       });
-      const result = await response.json();
-      console.log("Ответ сервера:", result);
+      console.log("Ответ сервера:", response);
     } catch (error) {
       console.error("Ошибка:", error);
     }

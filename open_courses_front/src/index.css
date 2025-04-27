@@ -1,23 +1,23 @@
-@import url("https://fonts.googleapis.com/css2?family=Geologica:wght@100..900&display=swap");
+/* @import url("https://fonts.googleapis.com/css2?family=Geologica:wght@100..900&display=swap"); */
 @import "tailwindcss";
 
 @theme {
-  --font-geologica: "Geologica", sans-serif; 
+  /* --font-geologica: "Geologica", sans-serif;  */
 }
 
 @layer base {
   h1, h2, h3, h4 {
     @apply font-bold;
-    @apply font-geologica;
+    /* @apply font-geologica; */
   }
 
   p, span, a {
     @apply font-normal;
-    @apply font-geologica;
+    /* @apply font-geologica; */
   }
 
   .shadcn-button {
     @apply font-medium;
-    @apply font-geologica;  
+    /* @apply font-geologica;   */
   }
 }

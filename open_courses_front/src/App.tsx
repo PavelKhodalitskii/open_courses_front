@@ -8,28 +8,31 @@ import LoginPage from '@/pages/LoginPage'
 import NotFoundPage from '@/pages/NotFoundPage'
 
 import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from './contexts/AuthContext';
 
 initCsrfToken()
 
 function Router() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<CourseCreator />} />
-        <Route path="/login/" element={<LoginPage />} />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </BrowserRouter>
-  );
+    return (
+        <AuthProvider>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/" element={<CourseCreator />} />
+                    <Route path="/login/" element={<LoginPage />} />
+                    <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+            </BrowserRouter>
+        </AuthProvider>
+    );
 }
 
 function App() {
-  return (
-    <>
-      <Router />
-      <Toaster />
-    </>
-  );
+    return (
+        <>
+            <Router />
+            <Toaster />
+        </>
+    );
 }
 
 export default App

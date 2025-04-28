@@ -3,7 +3,7 @@ import { useState } from "react";
 
 const Header = () => {
     const {user, logout} = useAuth();
-    const {logged_in, set_logged_in} = useState(user ? true : false);
+    // const {logged_in, set_logged_in} = useState(user ? true : false);
 
     return (
         <header className="bg-white shadow-sm">
@@ -16,7 +16,7 @@ const Header = () => {
                 <div className="flex items-center space-x-4">
                     <span>
                     { user ? 
-                        <div>
+                        <div className="flex-row gap-2">
                             {user.username}
                             <span onClick={logout}>Выйти</span>
                         </div>

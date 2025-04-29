@@ -2,7 +2,7 @@ import { Course, CourseWithModules } from "@/dataclasses/course";
 import { useState } from "react";
 import { Droppable, DropResult } from "react-beautiful-dnd";
 
-import Module from "@/components/Module"
+import EditorModule from "@/components/EditorModule"
 
 interface CourseContentEditorProps {
     course: CourseWithModules;
@@ -21,7 +21,7 @@ const CourseContentEditor = ({ course }: CourseContentEditorProps) => {
                 {(provided) => (
                     <div className="space-y-4 mb-4" ref={provided.innerRef} {...provided.droppableProps}>
                         {course.modules ? course.modules.map((module, index) => (
-                            <Module
+                            <EditorModule
                                 key={`module-${module.id}`}
                                 module={module}
                                 index={index}

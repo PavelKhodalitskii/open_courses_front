@@ -6,11 +6,12 @@ interface MaterialProps {
     material: Material;
 };
 
-const Material = ({ material, index }: MaterialProps) => {
+const EditorMaterial = ({ material, index }: MaterialProps) => {
     return (
         <Draggable draggableId={`material-${material.id}`} index={index}>
             {(provided) => (
-                <div className="flex-row gap-5 p-5 rounded-md border  border-gray-400" ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                <div className="flex row gap-5 p-5 rounded-md border  border-gray-400" ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                    <span>Материал: {index}</span>
                     <p>{material.title}</p>
                 </div>
             )}
@@ -18,4 +19,4 @@ const Material = ({ material, index }: MaterialProps) => {
     );
 };
 
-export default Material;
+export default EditorMaterial;

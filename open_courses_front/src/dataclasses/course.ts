@@ -20,10 +20,10 @@ export type Material = {
 };
 
 export type ModuleWithMaterials = Module & {
-    materials?: Material[];
+    materials: Material[];
 };
 
 export type CourseWithModules = Course & {
-    modules?: ModuleWithMaterials[] | null;
+    modules: ModuleWithMaterials[];
 };
   

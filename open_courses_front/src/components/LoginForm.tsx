@@ -1,4 +1,5 @@
 import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom';
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,6 +23,7 @@ function LoginForm() {
         formState: { errors, isSubmitting },
     } = useForm<FormData>();
 
+    const navigate = useNavigate();
     const { login } = useAuth();
 
     const onSubmit = async (data: FormData) => {
@@ -38,6 +40,7 @@ function LoginForm() {
             };
             console.log(user);
             login(user);
+            navigate("/");
         } catch (error) {
             console.error("Ошибка:", error);
         }

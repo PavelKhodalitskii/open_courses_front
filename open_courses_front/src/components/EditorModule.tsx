@@ -46,7 +46,7 @@ const EditorModule = ({ index, module }: ModuleProps) => {
                         </div>
                     </div>
                     {isExpanded && (
-                        <div>
+                        <div className="flex flex-col gap-5">
                             <Droppable droppableId={`materials-${module.id}`} type="material">
                                 {(provided) => (
                                     <div ref={provided.innerRef} {...provided.droppableProps} className="space-y-2">
@@ -61,6 +61,12 @@ const EditorModule = ({ index, module }: ModuleProps) => {
                                     </div>
                                 )}
                             </Droppable>
+                            <button
+                                className="w-full flex items-center justify-center py-4 bg-white hover:bg-gray-50 border border-gray-200 rounded-lg transition"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500 mr-2"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
+                                <span className="text-gray-600 font-medium">Добавить материал</span>
+                            </button>
                         </div>
                     )}
                 </div>

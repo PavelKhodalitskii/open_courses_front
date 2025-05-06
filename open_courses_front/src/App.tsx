@@ -1,19 +1,41 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { initCsrfToken } from './api/client';
+
+import CourseCreator from '@/pages/CourseCreatorMainPage'
+import CoursesList from '@/pages/CoursesListPage'
+import LoginPage from '@/pages/LoginPage'
+import NotFoundPage from '@/pages/NotFoundPage'
 
 import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from './contexts/AuthContext';
+
+initCsrfToken()
+
+function Router() {
+    return (
+        <AuthProvider>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/" element={<CourseCreator />} />
+                    <Route path="/my_courses/" element={<CoursesList/>} />
+                    <Route path="/my_courses/:courseId/edit" element={<CourseCreator />} />
+                    <Route path="/login/" element={<LoginPage />} />
+                    <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+            </BrowserRouter>
+        </AuthProvider>
+    );
+}
 
 function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <h1>Hello, Ipsilon</h1>
-      <Toaster />
-    </>
-  )
+    return (
+        <>
+            <Router />
+            <Toaster />
+        </>
+    );
 }
 
 export default App

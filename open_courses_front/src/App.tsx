@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { initCsrfToken } from './api/client';
 
 import CourseCreator from '@/pages/CourseCreatorMainPage'
+import CoursesList from '@/pages/CoursesListPage'
 import LoginPage from '@/pages/LoginPage'
 import NotFoundPage from '@/pages/NotFoundPage'
 
@@ -18,6 +19,8 @@ function Router() {
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<CourseCreator />} />
+                    <Route path="/my_courses/" element={<CoursesList/>} />
+                    <Route path="/my_courses/:courseId/edit" element={<CourseCreator />} />
                     <Route path="/login/" element={<LoginPage />} />
                     <Route path="*" element={<NotFoundPage />} />
                 </Routes>

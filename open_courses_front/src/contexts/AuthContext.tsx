@@ -4,7 +4,7 @@ import User from '@/dataclasses/user'
 type AuthContextType = {
     user: User | null;
     login: (userData: User) => void;
-    logout: () => Promise<void>; // Делаем logout асинхронным
+    logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

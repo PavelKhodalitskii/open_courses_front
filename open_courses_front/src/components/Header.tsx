@@ -11,7 +11,8 @@ const Header = () => {
                 <div className="flex space-x-6">
                     <a href="#" className="text-gray-700 font-medium">Курсы</a>
                     <a href="#" className="text-gray-700 font-medium">Моё обучение</a>
-                    <a href="#" className="text-gray-900 font-semibold border-b-2 border-gray-900">Преподавание</a>
+                    <a href="#" className="text-gray-700 font-medium">Преподавание</a>
+                    <a href="/my_courses/" className="text-gray-900 font-semibold border-b-2 border-gray-900">Мои курсы</a>
                 </div>
                 <div className="flex items-center space-x-4">
                     <span>

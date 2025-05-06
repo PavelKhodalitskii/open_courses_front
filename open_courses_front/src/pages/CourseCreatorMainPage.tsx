@@ -1,42 +1,89 @@
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
+import { useContext, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 import CourseSidebar from "@/components/CourseSidebar";
 import Header from "@/components/Header";
 import { useAuth } from "@/contexts/AuthContext";
 
-import { CourseWithModules } from "@/dataclasses/course";
-import { useContext, useState } from "react";
+import { CourseWithModules, type Course } from "@/dataclasses/course";
+
 import CourseContentEditor from "@/components/CourseContentEditor";
+import apiClient from "@/api/client";
 
 const CourseCreator = () => {
-    const [course, setCourse] = useState<CourseWithModules>({
-        id: 0,
-        title: "Говно для даунов",
-        description: "Курс для кретинов и полоумных",
-        is_published: false,
-        modules: [
-            {
-                id: 123, 
-                title: 'Программирование на Python', 
-                description: "123", 
-                order_index: 1, 
-                materials: 
-                [{ id: 1, title: "Тест по математике", order_index: 1 },
-                 { id: 2, title: "Лекция по Биологии", order_index: 2 }]
-            },
-            { id: 34652, title: 'Работа на фрезерном станке', description: "123", order_index: 2, materials: [] }
-        ]
-    });
+    const { courseId } = useParams<{ courseId: string }>();
 
+    const [loading, setLoading] = useState(true);
+
+    const [course, setCourse] = useState<CourseWithModules>();
 
     const { user } = useAuth();
+
+    const fetchCourseData = async () => {
+        try {
+            setLoading(true);
+            const response = await apiClient.get(`/courses/course/${courseId}/struct/`,
+                {
+                    headers: { "Content-Type": "application/json" },
+                });
+            const getted_course: CourseWithModules = {
+                id: response.data.id,
+                title: response.data.name,
+                description: response.data.description,
+                is_published: response.data.is_published,
+                modules: response.data.modules.map((module: any) => ({
+                    id: module.id,
+                    title: module.name,
+                    description: module.description,
+                    order_index: module.order_index,
+                    materials: [
+                        ...module.tasks.map((task: any) => ({
+                            id: task.id,
+                            title: task.name,
+                            order_index: task.order_index,
+                        })),
+                        ...module.lectures.map((lecture: any) => ({
+                            id: lecture.id,
+                            title: lecture.name,
+                            order_index: lecture.order_index,
+                        }))
+                    ].sort((one, another) => one.order_index - another.order_index)
+                }))
+            };
+            setCourse(getted_course);
+        } catch (error) {
+            console.error("Ошибка:", error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const saveCourse = async () => {
+        try {
+            const data: Course = {
+                id: course.id,
+                title: course.title,
+                description: course.description,
+            };
+            const response = await apiClient.post("/auths/session_based_auths/login/", JSON.stringify(data),
+                {
+                    headers: { "Content-Type": "application/json" },
+                });
+        } catch (error) {
+            console.error("Ошибка:", error);
+        }
+    }
+
+    useEffect(() => {
+        fetchCourseData();
+    }, []);
 
     const handleDragEnd = (result: DropResult) => {
         if (!result.destination) return;
 
         const { source, destination, type } = result;
 
-        // Перетаскивание модулей
         if (type === 'module') {
             const newModules = [...course.modules];
             const [moved] = newModules.splice(source.index, 1);
@@ -48,12 +95,10 @@ const CourseCreator = () => {
             });
         }
 
-        // Перетаскивание материалов
         if (type === 'material') {
-            // Находим исходный и целевой модули
             const sourceModuleId = source.droppableId.replace('materials-', '');
             const destModuleId = destination.droppableId.replace('materials-', '');
-            
+
             console.log("Source module: ", sourceModuleId);
             console.log("Dest module: ", destModuleId);
             console.log("Dest: ", destination.index);
@@ -79,19 +124,23 @@ const CourseCreator = () => {
             <Header />
 
             {/* Main Content */}
-            <main className="flex-1 container mx-auto px-4 py-6">
-                <div className="flex flex-col md:flex-row gap-6">
-                    <CourseSidebar
-                        course={course}
-                        user={user}
-                    />
-                    <DragDropContext onDragEnd={handleDragEnd}>
-                        <CourseContentEditor
+            {loading ? (
+                <div>Загрузка...</div>
+            ) : (
+                <main className="flex-1 container mx-auto px-4 py-6">
+                    <div className="flex flex-col md:flex-row gap-6">
+                        <CourseSidebar
                             course={course}
+                            user={user}
                         />
-                    </DragDropContext>
-                </div>
-            </main>
+                        <DragDropContext onDragEnd={handleDragEnd}>
+                            <CourseContentEditor
+                                course={course}
+                            />
+                        </DragDropContext>
+                    </div>
+                </main>
+            )}
         </div>
     );
 };

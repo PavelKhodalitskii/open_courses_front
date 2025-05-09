@@ -1,9 +1,12 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import User from '@/dataclasses/user'
+import apiClient from '@/api/client';
 
 type AuthContextType = {
     user: User | null;
+    loading: boolean;
     login: (userData: User) => void;
+    checkAuth: () => void;
     logout: () => Promise<void>;
 };
 
@@ -11,10 +14,27 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
-  
+    const [loading, setLoading] = useState(true);
+
+    // const checkAuth = async () => {
+    //     try {
+    //         setLoading(true);
+    //         const response = await apiClient.get('/auths/session_based_auths/check_auth/');
+    //         const userData = response.data;
+    //         login(userData);
+    //     } catch (error) {
+    //         localStorage.removeItem("user");
+    //         setUser(null);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
+
     useEffect(() => {
-        const savedUser = localStorage.getItem("user");
-        if (savedUser) setUser(JSON.parse(savedUser));
+        setLoading(true);
+        const user = localStorage.getItem("user");
+        if (user) setUser(JSON.parse(user));
+        setLoading(false);
     }, [])
 
     const login = (userData: User) => {
@@ -24,13 +44,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   
     const logout = async () => {
         try {
-            await fetch('/auths/session_based_auths/logout/', {
-                method: 'POST',
-                credentials: 'include',
-            });
-
+            await apiClient.post('/auths/session_based_auths/logout/')
             document.cookie = 'sessionid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-            // document.cookie = 'X-CSRFToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            document.cookie = 'X-CSRFToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
             localStorage.removeItem("user");
             setUser(null);
         } catch (error) {
@@ -39,7 +55,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={{ user, login, loading, logout }}>
             {children}
         </AuthContext.Provider>
     );

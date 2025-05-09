@@ -10,6 +10,7 @@ import NotFoundPage from '@/pages/NotFoundPage'
 
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from "@/utils/protected_route";
 
 initCsrfToken()
 
@@ -18,8 +19,16 @@ function Router() {
         <AuthProvider>
             <BrowserRouter>
                 <Routes>
-                    <Route path="/" element={<CourseCreator />} />
-                    <Route path="/my_courses/" element={<CoursesList/>} />
+                    <Route path="/" element={
+                        <ProtectedRoute>
+                            <CoursesList />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/my_courses/" element={
+                        <ProtectedRoute>
+                            <CoursesList/>
+                        </ProtectedRoute>
+                    } />
                     <Route path="/my_courses/:courseId/edit" element={<CourseCreator />} />
                     <Route path="/login/" element={<LoginPage />} />
                     <Route path="*" element={<NotFoundPage />} />

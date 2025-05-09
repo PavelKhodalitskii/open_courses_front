@@ -33,6 +33,7 @@ function LoginForm() {
                     headers: { "Content-Type": "application/json" },
                 });
             let user: User = {
+                id: response.data.user.id,
                 username: response.data.user.username,
                 first_name: response.data.user.first_name,
                 last_name: response.data.user.last_name,

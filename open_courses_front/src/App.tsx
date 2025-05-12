@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { initCsrfToken } from './api/client';
+import { initCsrfToken, } from './api/client';
 
 import CourseCreator from '@/pages/CourseCreatorMainPage'
 import CoursesList from '@/pages/CoursesListPage'

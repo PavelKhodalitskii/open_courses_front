@@ -16,25 +16,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
-    // const checkAuth = async () => {
-    //     try {
-    //         setLoading(true);
-    //         const response = await apiClient.get('/auths/session_based_auths/check_auth/');
-    //         const userData = response.data;
-    //         login(userData);
-    //     } catch (error) {
-    //         localStorage.removeItem("user");
-    //         setUser(null);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
+    const checkAuth = async () => {
+        setLoading(true)
+        try {
+            const response = await apiClient.get('/auths/session_based_auths/check_auth/');
+            let user: User = {
+                id: response.data.user.id,
+                username: response.data.user.username,
+                first_name: response.data.user.first_name,
+                last_name: response.data.user.last_name,
+                email: response.data.user.email
+            };
+            console.log(user);
+            login(user);
+        } catch (error) {
+            logout();
+            console.error('Невозможно авторизировать пользователя', error);
+        } finally {
+            setLoading(false)
+        }
+    }
 
     useEffect(() => {
-        setLoading(true);
-        const user = localStorage.getItem("user");
-        if (user) setUser(JSON.parse(user));
-        setLoading(false);
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
+        checkAuth();
     }, [])
 
     const login = (userData: User) => {

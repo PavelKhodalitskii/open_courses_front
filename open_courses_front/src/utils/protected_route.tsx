@@ -1,13 +1,13 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 
 interface ProtectedRouteProps {
     children: ReactNode;
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-    const { user, loading, checkAuth } = useAuth();
+    const { user, loading, logout } = useAuth();
 
     if (loading) {
         return <div>Loading...</div>;

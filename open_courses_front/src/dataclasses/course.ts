@@ -1,3 +1,10 @@
+export enum UpdateStatus {
+    NONE,
+    CREATED,
+    UPDATED,
+    DELETED,
+}
+
 export type Course = {
     id: number;
     title: string;
@@ -8,9 +15,11 @@ export type Course = {
 
 export type Module = {
     id: number;
-    title: string;
+    name: string;
     description: string;
     order_index: number;
+    update_status: UpdateStatus;
+    course: number;
 };
 
 export type Material = {
@@ -25,5 +34,6 @@ export type ModuleWithMaterials = Module & {
 
 export type CourseWithModules = Course & {
     modules: ModuleWithMaterials[];
+    deleted_modules: ModuleWithMaterials[];
 };
   

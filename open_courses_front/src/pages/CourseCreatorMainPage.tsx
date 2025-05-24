@@ -6,18 +6,16 @@ import CourseSidebar from "@/components/CourseSidebar";
 import Header from "@/components/Header";
 import { useAuth } from "@/contexts/AuthContext";
 
-import { CourseWithModules, type Course } from "@/dataclasses/course";
+import { CourseWithModules, type Course, UpdateStatus } from "@/dataclasses/course";
 
 import CourseContentEditor from "@/components/CourseContentEditor";
 import apiClient from "@/api/client";
 
 const CourseCreator = () => {
+    const [isSyncing, setIsSyncing] = useState(false);
     const { courseId } = useParams<{ courseId: string }>();
-
     const [loading, setLoading] = useState(true);
-
     const [course, setCourse] = useState<CourseWithModules>();
-
     const { user } = useAuth();
 
     const fetchCourseData = async () => {
@@ -34,9 +32,10 @@ const CourseCreator = () => {
                 is_published: response.data.is_published,
                 modules: response.data.modules.map((module: any) => ({
                     id: module.id,
-                    title: module.name,
+                    name: module.name,
                     description: module.description,
                     order_index: module.order_index,
+                    course: response.data.id,
                     materials: [
                         ...module.tasks.map((task: any) => ({
                             id: task.id,
@@ -49,7 +48,8 @@ const CourseCreator = () => {
                             order_index: lecture.order_index,
                         }))
                     ].sort((one, another) => one.order_index - another.order_index)
-                }))
+                })),
+                deleted_modules: []
             };
             setCourse(getted_course);
         } catch (error) {
@@ -59,27 +59,63 @@ const CourseCreator = () => {
         }
     }
 
-    const saveCourse = async () => {
-        try {
-            const data: Course = {
-                id: course.id,
-                title: course.title,
-                description: course.description,
-            };
-            const response = await apiClient.post("/auths/session_based_auths/login/", JSON.stringify(data),
-                {
-                    headers: { "Content-Type": "application/json" },
-                });
-        } catch (error) {
-            console.error("Ошибка:", error);
+    const saveModules = async () => {
+        if (!course) return;
+
+        for (let module of course.modules) {
+            switch (module.update_status) {
+                case UpdateStatus.UPDATED:
+                    try {
+                        const response = await apiClient.put(`/courses/modules/${module.id}/`, JSON.stringify(module),
+                            {
+                                headers: { "Content-Type": "application/json" },
+                            });
+                    } catch (error) {
+                        console.error("Ошибка:", error);
+                    }
+                    break;
+                case UpdateStatus.CREATED:
+                    try {
+                        const response = await apiClient.post(`/courses/modules/`, JSON.stringify(module),
+                            {
+                                headers: { "Content-Type": "application/json" },
+                            });
+                    } catch (error) {
+                        console.error("Ошибка:", error);
+                    }
+                    break;
+            }
+        }
+        for (let module of course.deleted_modules) {
+            console.log("DELETING")
+            try {
+                const response = await apiClient.delete(`/courses/modules/${module.id}/`,
+                    {
+                        headers: { "Content-Type": "application/json" },
+                    });
+            } catch (error) {
+                console.error("Ошибка:", error);
+            }
+            break;
         }
     }
+
+    const saveCourse = async () => {
+        if (!course) return;
+
+        setIsSyncing(true);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        await saveModules();
+        setIsSyncing(false);
+    }
+
 
     useEffect(() => {
         fetchCourseData();
     }, []);
 
     const handleDragEnd = (result: DropResult) => {
+        if (!course) return;
         if (!result.destination) return;
 
         const { source, destination, type } = result;
@@ -91,7 +127,7 @@ const CourseCreator = () => {
 
             setCourse({
                 ...course,
-                modules: newModules.map((m, i) => ({ ...m, order_index: i + 1 }))
+                modules: newModules.map((m, i) => ({ ...m, order_index: i + 1, update_status: UpdateStatus.UPDATED }))
             });
         }
 
@@ -128,6 +164,14 @@ const CourseCreator = () => {
                 <div>Загрузка...</div>
             ) : (
                 <main className="flex-1 container mx-auto px-4 py-6">
+                    {/* Затемнение и спиннер */}
+                    {isSyncing && (
+                        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+                        </div>
+                    )}
+
+
                     <div className="flex flex-col md:flex-row gap-6">
                         <CourseSidebar
                             course={course}
@@ -138,6 +182,16 @@ const CourseCreator = () => {
                                 course={course}
                             />
                         </DragDropContext>
+                    </div>
+
+                    {/* Кнопка сохранения курса */}
+                    <div className="fixed bottom-4 right-4">
+                        <button
+                            className="bg-gray-700 text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-800 transition"
+                            onClick={saveCourse}
+                        >
+                            Сохранить
+                        </button>
                     </div>
                 </main>
             )}

@@ -99,7 +99,7 @@ const CoursesList = () => {
                     <div className="flex flex-col items-center gap-10 mt-20 p-10">
                         <div className="w-full flex flex-row justify-between">
                             <h1>Мои курсы</h1>
-                            {/* <Button className="bg-[#00D07D]">Добавить курс</Button> */}
+
                             {/* Модальное окно для создания курса */}
                             <Dialog open={isModuleCreateDialogOpen} onOpenChange={setIsModuleCreateDialogOpen}>
                                 <DialogTrigger asChild>

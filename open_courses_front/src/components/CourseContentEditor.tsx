@@ -1,8 +1,11 @@
-import { Course, CourseWithModules } from "@/dataclasses/course";
+import { Course, CourseWithModules, Module, ModuleWithMaterials, UpdateStatus } from "@/dataclasses/course";
 import { useState } from "react";
 import { Droppable, DropResult } from "react-beautiful-dnd";
 
 import EditorModule from "@/components/EditorModule"
+import apiClient from "@/api/client";
+import { GenericModalForm } from "./GenericModalForm";
+import moduleFields, { ModuleForm } from "@/forms/course_forms";
 
 interface CourseContentEditorProps {
     course: CourseWithModules;
@@ -10,9 +13,36 @@ interface CourseContentEditorProps {
 
 const CourseContentEditor = ({ course }: CourseContentEditorProps) => {
     const [isAddModuleModalOpen, setAddModuleModalOpen] = useState(false);
+    const [itemDeletedEffect, setItemDeletedEffect] = useState(false);
 
-    function onSave() {
-        console.log("Курс сохранен");
+    function handleAddModule(data: ModuleForm): void | Promise<void> {
+        let newModule: ModuleWithMaterials = {
+            id: Number(String(course.id) + String((course.modules[course.modules.length - 1]?.id + 1 | 0))),
+            name: data.name,
+            description: data.description,
+            order_index: (course.modules[course.modules.length - 1]?.order_index + 1 | 1),
+            update_status: UpdateStatus.CREATED,
+            course: course.id,
+            materials: [],
+        }
+        course.modules.push(newModule)
+    }
+
+    function handleDeleteModule(moduleIndex: number) {
+        const newModules = [...course.modules];
+        
+        if (!course.deleted_modules) course.deleted_modules = Array();
+        course.deleted_modules.push(newModules[moduleIndex])
+        newModules.splice(moduleIndex, 1);
+
+        const updatedModules = newModules.map((module, index) => {
+            if (index > moduleIndex) {
+                return { ...module, order_index: module.order_index - 1, update_status: UpdateStatus.UPDATED };
+            }
+            return module;
+        });
+        course.modules = updatedModules;
+        setItemDeletedEffect(true);
     }
 
     return (
@@ -25,6 +55,8 @@ const CourseContentEditor = ({ course }: CourseContentEditorProps) => {
                                 key={`module-${module.id}`}
                                 module={module}
                                 index={index}
+                                course={course}
+                                onDelete={handleDeleteModule}
                             />
                         )) : <h3>Вы пока не создали модуль!</h3>}
                         {provided.placeholder}
@@ -43,22 +75,14 @@ const CourseContentEditor = ({ course }: CourseContentEditorProps) => {
                 )}
             </Droppable>
 
-            {/* Кнопка сохранения курса */}
-            <div className="flex justify-end mt-6">
-                <button
-                    className="bg-gray-700 text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-800 transition"
-                    onClick={onSave}
-                >
-                    Сохранить
-                </button>
-            </div>
-
-            {/* Add Module Modal
-            <AddModuleModal
+            <GenericModalForm<ModuleForm>
                 isOpen={isAddModuleModalOpen}
                 onClose={() => setAddModuleModalOpen(false)}
                 onSubmit={handleAddModule}
-            /> */}
+                title="Добавить новый модуль"
+                fields={moduleFields}
+                submitButtonText="Добавить модуль"
+            />
         </div>
     );
 };
